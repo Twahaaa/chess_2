@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+      .chessboard {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        grid-template-rows: repeat(8, minmax(0, 1fr));
+        width: 500px;
+        aspect-ratio: 1;
+        height: 500px;
+        transform: rotate(0deg);
+      }
+
+      .piece.white {
+        color: white;
+        /* filter: drop-shadow(0 0 2px rgba(0, 0, 0, 1)); */
+      }
+
+      .piece.black {
+        color: black;
+      }
+
+      .flipped {
+        transform: rotate(180deg);
+      }
+
+      .square {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        width: 100%;
+        aspect-ratio: 1;
+      }
+
+      .square.light {
+        background-color: #f5f5e0;
+      }
+
+      .square.dark {
+        background-color: #6b9048;
+      }
+
+      .piece {
+        font-size: 38px;
+        cursor: grab;
+      }
+
+      .piece.draggable {
+        cursor: grab;
+      }
+
+      .dragging {
+        opacity: 0.5;
+      }
+
+      /* Rotate pieces for black player */
+      .flipped .piece {
+        transform: rotate(180deg);
+      }
+
+      .flip-180 {
+        transform: rotate(180deg);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      class="flex items-center w-full h-screen overflow-auto bg-zinc-900 flex-row"
+    >
+      <div class="w-4/5 h-screen flex items-center justify-center bg-zinc-900">
+        <div class="chessboard"></div>
+      </div>
+      <div class="w-1/5 h-screen flex flex-col items-center justify-start bg-neutral-800">
+        <div class="w-full items-center justify-center text-center text-white pt-4 pb-4 text-2xl font-extrabold bg-neutral-850">
+          <h1>MOVES MADE</h1>
+        </div>
+      </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.socket.io/4.8.1/socket.io.min.js"
+      integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"
+      integrity="sha512-xRllwz2gdZciIB+AkEbeq+gVhX8VB8XsfqeFbUh+SzHlN96dEduwtTuVuc2u9EROlmW9+yhRlxjif66ORpsgVA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script>
+      const socket = io();
+      const roomId =  "<%= gameId %>";
+      socket.emit("joinRoom", roomId);
+      window.roomId = roomId;
+    </script>
+    <script src="/js/chessgame.js"></script>
+  </body>
+</html>

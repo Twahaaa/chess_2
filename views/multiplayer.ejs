@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>80:20 Horizontal Split</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div class="flex w-screen h-screen bg-zinc-900 overflow-auto">
+      <div class="w-3/5 h-full flex items-center justify-center">
+        <img
+          src="/pieces/chessboard.png"
+          alt="chessboard"
+          width="500"
+          height="500"
+        />
+      </div>
+      <div class="w-2/5 h-full flex flex-col justify-center items-center space-y-10">
+        <button
+          id="create-but"
+          class="bg-lime-700 w-72 py-7 font-extrabold text-2xl rounded-xl text-white hover:bg-lime-900 hover:text-slate-300"
+        >
+          CREATE Room
+        </button>
+        <script>
+            const button = document.getElementById('create-but');
+            button.addEventListener('click', () => {
+                const roomId = crypto.randomUUID();
+                const url = `/game/${roomId}`;
+                window.location.href = url;
+            });
+        </script>
+        <button
+          id="join-but"
+          class="bg-lime-700 w-72 py-7 font-extrabold text-2xl rounded-xl text-white hover:bg-lime-900 hover:text-slate-300"
+        >
+          JOIN Room
+        </button>
+      </div>      
+    </div>
+  </body>
+</html>
