@@ -17,7 +17,7 @@ const games = {};
 
 const chess = new Chess();
 // let players = {};
-// let currentPlayer = "w";
+let currentPlayer = "w";
 
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
@@ -44,6 +44,10 @@ io.on("connection", (socket) => {
       games[gameId] = { players: {}, chess: new Chess() };
     }
     const game = games[gameId];
+    const { players } = game;
+
+    socket.join(gameId);
+    socket.data.gameId = gameId;
 
     if (!players.white) {
       players.white = socket.id;
@@ -55,8 +59,9 @@ io.on("connection", (socket) => {
       socket.emit("spectatorRole");
     }
 
-    socket.data.gameId = gameId;
+    socket.emit("boardState", game.chess.fen());
   });
+
   socket.on("move", (move) => {
     const roomId = socket.data.gameId;
     if (!roomId || !games[roomId]) return;

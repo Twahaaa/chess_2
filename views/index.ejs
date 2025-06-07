@@ -98,7 +98,8 @@
     <script>
       const socket = io();
       const roomId =  "<%= gameId %>";
-      socket.emit("joinRoom", roomId);
+      socket.emit("joinGame", roomId);
+      console.log("Joined room:", roomId);
       window.roomId = roomId;
     </script>
     <script src="/js/chessgame.js"></script>
