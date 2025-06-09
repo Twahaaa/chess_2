@@ -6,85 +6,6 @@ let draggedPiece = null;
 let sourceSquare = null;
 let playerRole = null;
 
-// const renderBoard = () => {
-//   const board = chess.board();
-//   boardElement.innerHTML = "";
-
-//   boardElement.classList.add(
-//     "grid",
-//     "grid-cols-8",
-//     "w-full",
-//     "max-w-[400px]",
-//     "aspect-square"
-//   );
-
-//   // Flip rows for white player to have correct orientation
-//   const displayBoard = playerRole === "w" ? board : [...board].reverse();
-
-//   displayBoard.forEach((row, displayRowIndex) => {
-//     row.forEach((square, colIndex) => {
-//       // Calculate original rowIndex (0 at top, 7 at bottom)
-//       const rowIndex =
-//         playerRole === "w" ? displayRowIndex : 7 - displayRowIndex;
-
-//       const squareElement = document.createElement("div");
-//       squareElement.classList.add(
-//         "w-full",
-//         "aspect-square",
-//         "flex",
-//         "items-center",
-//         "justify-center",
-//         (rowIndex + colIndex) % 2 === 0 ? "bg-orange-100" : "bg-green-600"
-//       );
-//       squareElement.dataset.row = rowIndex;
-//       squareElement.dataset.col = colIndex;
-
-//       if (square) {
-//         const pieceElement = document.createElement("div");
-//         pieceElement.classList.add(
-//           "text-xl",
-//           "select-none",
-//           "cursor-grab",
-//           square.color === "w" ? "text-white" : "text-black"
-//         );
-//         //   pieceElement.innerText = getPieceUnicode(square);
-//         const pieceImg = getPieceImage(square);
-//         if (pieceImg) pieceElement.appendChild(pieceImg);
-//         pieceElement.draggable = playerRole === square.color;
-
-//         pieceElement.addEventListener("dragstart", (e) => {
-//           if (pieceElement.draggable) {
-//             draggedPiece = pieceElement;
-//             sourceSquare = { row: rowIndex, col: colIndex };
-//             e.dataTransfer.setData("text/plain", ""); // Required for Firefox
-//           }
-//         });
-
-//         pieceElement.addEventListener("dragend", () => {
-//           draggedPiece = null;
-//           sourceSquare = null;
-//         });
-
-//         squareElement.appendChild(pieceElement);
-//       }
-
-//       squareElement.addEventListener("dragover", (e) => e.preventDefault());
-//       squareElement.addEventListener("drop", (e) => {
-//         e.preventDefault();
-//         if (draggedPiece) {
-//           const targetSquare = {
-//             row: parseInt(squareElement.dataset.row),
-//             col: parseInt(squareElement.dataset.col),
-//           };
-//           handleMove(sourceSquare, targetSquare);
-//         }
-//       });
-
-//       boardElement.appendChild(squareElement);
-//     });
-//   });
-// };
-
 const render = () => {
   const board = chess.board();
   boardElement.innerHTML = "";
@@ -115,8 +36,8 @@ const render = () => {
             const dragPreview = pieceElement.cloneNode(true);
 
             dragPreview.style.transform = "rotate(0deg)";
-            dragPreview.style.width = "40px"; // or same as original
-            dragPreview.style.height = "40px";
+            dragPreview.style.width = "60px"; // or same as original
+            dragPreview.style.height = "60px";
             dragPreview.style.position = "absolute";
             dragPreview.style.top = "-9999px"; // hide from actual screen
             document.body.appendChild(dragPreview);
@@ -201,14 +122,45 @@ const getPieceImage = (piece) => {
   return img;
 };
 
+const movesList = document.getElementById("moveslist");
+
+let movesHistory = [];
+
+// Function to render moves on the sidebar
+function renderMoves() {
+  movesList.innerHTML = "";
+  movesHistory.forEach((move, index) => {
+    const moveElement = document.createElement("div");
+    // Show move number and move in algebraic notation
+    const moveNum = Math.floor(index / 2) + 1;
+    if (index % 2 === 0) {
+      // White's move
+      moveElement.textContent = `w: ${move}`;
+    } else {
+      // Black's move
+      moveElement.textContent = `b: ${move}`;
+    }
+    movesList.appendChild(moveElement);
+  });
+
+  // Scroll to the bottom to show the latest move
+  movesList.scrollTop = movesList.scrollHeight;
+  
+}
+
+
 socket.on("playerRole", (role) => {
   playerRole = role;
+  movesHistory=[];
   render();
+  renderMoves();
 });
 
 socket.on("spectatorRole", () => {
   playerRole = null;
+  movesHistory=[];
   render();
+  renderMoves();
 });
 
 socket.on("boardState", (fen) => {
@@ -218,7 +170,9 @@ socket.on("boardState", (fen) => {
 
 socket.on("move", (move) => {
   chess.move(move);
+  movesHistory.push(move.from+"-"+move.to);
   render();
+  renderMoves();
 });
 
 render();
